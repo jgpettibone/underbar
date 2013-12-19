@@ -58,6 +58,7 @@ var _ = { };
   // Call iterator(value, key, collection) for each element of collection.
   // Accepts both arrays and objects.
   _.each = function(collection, iterator) {
+178.5
       if (Array.isArray(collection)) {
 	  //an Array
 	  for (var i = 0; i < collection.length; i++) {
@@ -126,6 +127,7 @@ var _ = { };
   // Produce a duplicate-free version of the array.
   _.uniq = function(array) {
 
+      //use _.each
 
       var myObj={};
       myObj[array[0]]=1;
