@@ -127,19 +127,26 @@ var _ = { };
   // Produce a duplicate-free version of the array.
   _.uniq = function(array) {
 
-      //use _.each
-
       var myObj={};
       myObj[array[0]]=1;
       var newArr = [];
       newArr[0] = array[0];
 
+      _.each(array, function(element, index, collection) {
+	      if(!(element in myObj)) {
+		  newArr.push(element);
+		  myObj[element]=1;
+	      }
+	  });
+
+      /*
       for (var i=1; i<array.length; i++) {
 	  if(!(array[i] in myObj)) {
 	      newArr.push(array[i]);
 	      myObj[array[i]]=1;
 	  }
       }
+      */
 
       return newArr;
 
@@ -188,7 +195,12 @@ var _ = { };
   _.invoke = function(list, methodName, args) {
       //need to figure out how to make a string into a function
       //eval not working and many warnings against using it 
-  };
+      
+      var meth = "Array.prototype." + methodName;
+      return _.map(list, function(element) {
+	      return meth.apply(this, element, args);
+	  });
+ };
 
   // Reduces an array or object to a single value by repetitively calling
   // iterator(previousValue, item) for each item. previousValue should be
@@ -237,7 +249,11 @@ var _ = { };
 	      if (!(testBool)) {
 		  return false;
 	      }
-	      return (iterator(element));
+	      if (typeof(iterator) === 'undefined') {
+		  return !!element;
+	      } else {
+		  return !!(iterator(element));
+	      }
 	  }, true);
   };
 
@@ -245,6 +261,18 @@ var _ = { };
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+
+      var testBool = false;
+      return _.reduce(collection, function(testBool, element) {
+	      if (testBool) {
+		  return true;
+	      }
+	      if (typeof(iterator) === 'undefined') {
+		  return !!element;
+	      } else {
+		  return !!(iterator(element));
+	      }
+	  }, false);
   };
 
 
@@ -267,11 +295,42 @@ var _ = { };
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+
+      var newObj = {};
+
+      /*
+      _.each(obj, function(element, index, collection) {
+	      _.each(element, function(el, ind, coll) {
+		      newObj[ind] = el;
+	      });
+	  });
+      */
+
+      for (var i=0;i<arguments.length;i++) {
+	  for (var key in arguments[i]) {
+	      newObj[key] =arguments[i][key];
+	  }
+      }
+
+      return newObj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
+
+  //QUESTION - I don't understand the testing for this one
   _.defaults = function(obj) {
+
+      var newObj = {};
+      for (var i=0;i<arguments.length;i++) {
+	  for (var key in arguments[i]) {
+	      if (!(key in newObj)) {
+		  newObj[key] = arguments[i][key];
+	      }
+	  }
+      }
+      return newObj;
+
   };
 
 
@@ -312,6 +371,18 @@ var _ = { };
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+      
+      var results = {};
+      var arg = arguments;
+      
+      return function() {
+
+	  if (!(arg in results)) {
+	      results[arg] = func.apply(this, arguments);
+	  }
+	  return results[arg];
+      };
+
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -321,6 +392,10 @@ var _ = { };
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+
+      var params = Array.prototype.slice.call(arguments, 2);
+      return setTimeout(function() { return func.apply(null, params);}, wait);
+
   };
 
 
@@ -330,7 +405,22 @@ var _ = { };
    */
 
   // Shuffle an array.
+
+  // QUESTION - is the testing wrong?  it sorts the shuffled array which
+  // makes it equal to the original ...
   _.shuffle = function(array) {
+
+      //shuffle array - Fisher-Yates shuffle via wikipedia
+      var newArr = array.slice();
+      var len = array.length;
+      
+      for (var i=len-1; i>0; i--) {
+	  var rand = Math.round(Math.random() * (i-0) + 0);
+	  var temp = newArr[rand];
+	  newArr[rand] = newArr[i];
+	  newArr[i] = temp;
+      }
+      
   };
 
 
