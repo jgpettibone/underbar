@@ -58,7 +58,7 @@ var _ = { };
   // Call iterator(value, key, collection) for each element of collection.
   // Accepts both arrays and objects.
   _.each = function(collection, iterator) {
-178.5
+
       if (Array.isArray(collection)) {
 	  //an Array
 	  for (var i = 0; i < collection.length; i++) {
@@ -100,11 +100,21 @@ var _ = { };
   _.filter = function(collection, iterator) {
 
       var newArr = [];
+
+      _.each(collection, function(element, index) {
+	      if (iterator(element)) {
+		  newArr.push(element);
+	      }
+	  });
+
+
+      /*
       for (var i = 0; i < collection.length; i++) {
 	  if (iterator(collection[i])) {
 	      newArr.push(collection[i]);
 	  }
       }
+      */
       return newArr;
 
   };
@@ -115,11 +125,20 @@ var _ = { };
     // copying code in and modifying it
 
       var newArr = [];
+
+      _.each(collection, function(element, index) {
+	      if (iterator(element) == false) {
+		  newArr.push(element);
+	      }
+	  });
+
+      /*
       for (var i = 0; i < collection.length; i++) {
 	  if (iterator(collection[i]) == false) {
 	      newArr.push(collection[i]);
 	  }
       }
+      */
       return newArr;
 
   };
@@ -132,7 +151,7 @@ var _ = { };
       var newArr = [];
       newArr[0] = array[0];
 
-      _.each(array, function(element, index, collection) {
+      _.each(array, function(element, index) {
 	      if(!(element in myObj)) {
 		  newArr.push(element);
 		  myObj[element]=1;
@@ -221,7 +240,7 @@ var _ = { };
 	  initialValue = 0;
       }
       var prevVal = initialValue;
-      _.each(collection, function(element, index, coll) {
+      _.each(collection, function(element, index) {
 	      prevVal = iterator(prevVal, element);
 	  });
       return prevVal;
@@ -296,22 +315,23 @@ var _ = { };
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
 
-      var newObj = {};
+      var newObj = arguments[0];
 
       /*
       _.each(obj, function(element, index, collection) {
-	      _.each(element, function(el, ind, coll) {
-		      newObj[ind] = el;
+
+	      _.each(element, function(value, key, coll) {
+		      newObj[key] = value;
 	      });
+
 	  });
       */
 
-      for (var i=0;i<arguments.length;i++) {
+      for (var i=1;i<arguments.length;i++) {
 	  for (var key in arguments[i]) {
 	      newObj[key] =arguments[i][key];
 	  }
       }
-
       return newObj;
   };
 
@@ -321,11 +341,13 @@ var _ = { };
   //QUESTION - I don't understand the testing for this one
   _.defaults = function(obj) {
 
-      var newObj = {};
-      for (var i=0;i<arguments.length;i++) {
-	  for (var key in arguments[i]) {
+      var newObj = arguments[0];
+
+      for (var i=1;i<arguments.length;i++) {
+	  var list = arguments[i];
+	  for (var key in list) {
 	      if (!(key in newObj)) {
-		  newObj[key] = arguments[i][key];
+		  newObj[key] = list[key];
 	      }
 	  }
       }
@@ -374,9 +396,13 @@ var _ = { };
       
       var results = {};
       var arg = arguments;
-      
+      var initial = true;
+
       return function() {
 
+	  if (initial) {
+	      results[arg] = func.apply(this, arguments);
+	  }
 	  if (!(arg in results)) {
 	      results[arg] = func.apply(this, arguments);
 	  }
@@ -406,8 +432,6 @@ var _ = { };
 
   // Shuffle an array.
 
-  // QUESTION - is the testing wrong?  it sorts the shuffled array which
-  // makes it equal to the original ...
   _.shuffle = function(array) {
 
       //shuffle array - Fisher-Yates shuffle via wikipedia
