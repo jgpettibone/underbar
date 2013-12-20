@@ -420,7 +420,7 @@ var _ = { };
 	  newArr[rand] = newArr[i];
 	  newArr[i] = temp;
       }
-      
+      return newArr;
   };
 
 
