@@ -16,28 +16,25 @@ var _ = { };
   // Return an array of the first n elements of an array. If n is undefined,
   // return just the first element.
   _.first = function(array, n) {
-      var arrLen = array.length;
-      if (typeof n == 'undefined') {
-	  return array[0];
-      } else {
-	  var newArr = [];
-	  var limit;
-	  if (n > arrLen) {
-	      limit = arrLen;
-	  } else {
-	      limit = n;
-	  }
-	  for (var i = 0; i < limit; i++) {
-	      newArr.push(array[i]);
-	  }
-	  return newArr;
-      }
+
+      return n === undefined ? array[0] : array.slice(0, n);
+
   };
 
   // Like first, but for the last elements. If n is undefined, return just the
   // last element.
   _.last = function(array, n) {
+
       var arrLen = array.length;
+      if (n > arrLen) {
+	  var ind = 0;
+      } else {
+	  var ind = arrLen-n;
+      }
+      return n === undefined ? array[arrLen-1] : array.slice(ind, arrLen);
+
+
+      /*
       if (typeof n == 'undefined') {
 	  return array[arrLen-1];
       } else {
@@ -53,6 +50,7 @@ var _ = { };
 	  }
 	  return newArr;
       }
+      */
   };
 
   // Call iterator(value, key, collection) for each element of collection.
@@ -79,21 +77,16 @@ var _ = { };
     // implemented for you. Instead of using a standard `for` loop, though,
     // it uses the iteration helper `each`, which you will need to write.
 
-      /*
-      _.each(array, function(element, index, collection) {
-	      if (element == target) {
-		  return index;
-	      } 
+      var result = -1;
+
+      _.each(array, function(item, index) {
+	      if (item === target && result === -1) {
+		  result = index;
+	      }
 	  });
-      */
-      
-      for (var i = 0; i < array.length; i++) {
-	  if (array[i] == target) {
-	      return i;
-	  }
-      }
-      
-      return -1;
+
+      return result;
+
   };
 
   // Return all elements of an array that pass a truth test.
@@ -107,7 +100,6 @@ var _ = { };
 	      }
 	  });
 
-
       /*
       for (var i = 0; i < collection.length; i++) {
 	  if (iterator(collection[i])) {
@@ -115,6 +107,7 @@ var _ = { };
 	  }
       }
       */
+
       return newArr;
 
   };
@@ -212,13 +205,17 @@ var _ = { };
 
   // Calls the method named by methodName on each value in the list.
   _.invoke = function(list, methodName, args) {
-      //need to figure out how to make a string into a function
-      //eval not working and many warnings against using it 
       
-      var meth = "Array.prototype." + methodName;
       return _.map(list, function(element) {
-	      return meth.apply(this, element, args);
+	      if (typeof methodName === 'function') {
+		  //function reference
+		  return methodName.apply(element, args);
+	      } else {
+		  //need context when string
+		  return element[methodName].apply(element, args);
+	      }
 	  });
+
  };
 
   // Reduces an array or object to a single value by repetitively calling
@@ -315,34 +312,51 @@ var _ = { };
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
 
+
       var newObj = arguments[0];
-
-      /*
-      _.each(obj, function(element, index, collection) {
-
-	      _.each(element, function(value, key, coll) {
+      var initial = true;
+      
+      _.each(arguments, function(element, index) {
+	      if (!(initial)) {
+		  _.each(element, function(value, key) {
 		      newObj[key] = value;
-	      });
-
+		      });
+	      } else {
+		  initial = false;
+	      }
 	  });
-      */
 
+      /*      
       for (var i=1;i<arguments.length;i++) {
 	  for (var key in arguments[i]) {
-	      newObj[key] =arguments[i][key];
+	      newObj[key] = arguments[i][key];
 	  }
       }
+      */
       return newObj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
 
-  //QUESTION - I don't understand the testing for this one
   _.defaults = function(obj) {
 
       var newObj = arguments[0];
+      var initial = true;
 
+      _.each(arguments, function(element, index) {
+	      if (!(initial)) {
+		  _.each(element, function(value, key) {
+			  if (!(key in newObj)) {
+			      newObj[key] = value;
+			  }
+		      });
+	      } else {
+		  initial = false;
+	      }
+	  });
+
+      /*
       for (var i=1;i<arguments.length;i++) {
 	  var list = arguments[i];
 	  for (var key in list) {
@@ -351,6 +365,8 @@ var _ = { };
 	      }
 	  }
       }
+      */
+
       return newObj;
 
   };
@@ -435,6 +451,8 @@ var _ = { };
   _.shuffle = function(array) {
 
       //shuffle array - Fisher-Yates shuffle via wikipedia
+      //pseudocode worked backwards through array but probably could
+      //change it to use _.each - later
       var newArr = array.slice();
       var len = array.length;
       
