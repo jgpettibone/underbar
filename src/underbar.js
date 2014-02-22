@@ -292,6 +292,18 @@ var _ = { };
   };
 
 
+  // Farhad's super sweet logical some
+  //   _.some = function(collection, iterator) {
+  //   // TIP: There's a very clever way to re-use every() here.
+  //   iterator = iterator || function(i) { return i; };
+
+  //   return !_.every(collection, function(item) {
+  //     return !iterator(item);
+  //   });
+  // };
+
+
+
   /**
    * OBJECTS
    * =======
@@ -410,20 +422,20 @@ var _ = { };
   // instead if possible.
   _.memoize = function(func) {
       
-      var results = {};
-      var arg = arguments;
-      var initial = true;
+    var results = {};
+    var arg = arguments;
+    var initial = true;
 
-      return function() {
+    return function() {
 
-	  if (initial) {
-	      results[arg] = func.apply(this, arguments);
-	  }
-	  if (!(arg in results)) {
-	      results[arg] = func.apply(this, arguments);
-	  }
-	  return results[arg];
-      };
+  	  if (initial) {
+  	      results[arg] = func.apply(this, arguments);
+  	  }
+  	  if (!(arg in results)) {
+  	      results[arg] = func.apply(this, arguments);
+  	  }
+  	  return results[arg];
+    };
 
   };
 
@@ -450,12 +462,12 @@ var _ = { };
 
   _.shuffle = function(array) {
 
-      //shuffle array - Fisher-Yates shuffle via wikipedia
-      //pseudocode worked backwards through array but probably could
-      //change it to use _.each - later
-      var newArr = array.slice();
-      var len = array.length;
-      
+    //shuffle array - Fisher-Yates shuffle via wikipedia
+    //pseudocode worked backwards through array but probably could
+    //change it to use _.each - later
+    var newArr = array.slice();
+    var len = array.length;
+    
       for (var i=len-1; i>0; i--) {
 	  var rand = Math.round(Math.random() * (i-0) + 0);
 	  var temp = newArr[rand];
@@ -463,6 +475,11 @@ var _ = { };
 	  newArr[i] = temp;
       }
       return newArr;
+  };
+
+  // Farhad's super sweet shuffle
+  _.shuffle = function(array) {
+    return array.slice().sort(function() { return Math.random() - 0.5; });
   };
 
 
@@ -477,6 +494,13 @@ var _ = { };
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
   _.sortBy = function(collection, iterator) {
+    return collection.sort(function(a, b) {
+      if (typeof iterator === 'string') {
+        return a[String(iterator)] - b[String(iterator)];
+      } else {
+        return iterator(a) - iterator(b);
+      }
+    });
   };
 
   // Zip together two or more arrays with elements of the same index
@@ -485,6 +509,15 @@ var _ = { };
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
+    var sortedArr = _.sortBy(Array.prototype.slice.call(arguments), 'length');
+    var max = sortedArr.slice(-1)[0].length;
+    var result = [];
+
+    for(var i = 0; i < max; i++) {
+      result[i] = _.pluck(arguments, i);
+    }
+
+    return result;
   };
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
@@ -492,16 +525,39 @@ var _ = { };
   //
   // Hint: Use Array.isArray to check if something is an array
   _.flatten = function(nestedArray, result) {
+    return _.reduce(nestedArray, function(result, item){
+      if (Array.isArray(item)) {
+        return result.concat(_.flatten(item));
+      } else {
+        return result.concat(item);
+      }
+    }, []);
   };
 
   // Takes an arbitrary number of arrays and produces an array that contains
   // every item shared between all the passed-in arrays.
   _.intersection = function() {
+    var first = arguments[0];
+    var others = Array.prototype.slice.call(arguments, 1);
+    
+    return _.filter(_.uniq(first), function(item) {
+      return _.every(others, function(array) {
+        return _.indexOf(array, item) > -1;
+      });
+    });
   };
 
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
   _.difference = function(array) {
+    var first = arguments[0];
+    var others = Array.prototype.slice.call(arguments, 1);
+    
+    return _.filter(_.uniq(first), function(item) {
+      return _.every(others, function(array) {
+        return _.indexOf(array, item) === -1;
+      });
+    });
   };
 
 
