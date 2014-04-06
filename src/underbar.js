@@ -194,11 +194,7 @@ var _ = { };
       if (!(testBool)) {
   		  return false;
       }
-      if (typeof(iterator) === 'undefined') {
-  		  return !!element;
-      } else {
-  		  return !!(iterator(element));
-      }
+      return (iterator === undefined ? !!element : !!iterator(element));
 	  }, true);
   };
 
