@@ -44,12 +44,10 @@ var _ = { };
   // Accepts both arrays and objects.
   _.each = function(collection, iterator) {
     if (Array.isArray(collection)) {
-  	  //an Array
   	  for (var i = 0; i < collection.length; i++) {
   	    iterator(collection[i], i, collection);
   	  }
     } else {
-  	  //an Object
   	  for (var key in collection) {
 	      iterator(collection[key], key, collection);
   	  }
@@ -63,8 +61,8 @@ var _ = { };
     // implemented for you. Instead of using a standard `for` loop, though,
     // it uses the iteration helper `each`, which you will need to write.
     var result = -1;
-    _.each(array, function(item, index) {
-      if (item === target && result === -1) {
+    _.each(array, function(element, index) {
+      if (element === target && result === -1) {
   		  result = index;
       }
 	  });
@@ -73,26 +71,26 @@ var _ = { };
 
   // Return all elements of an array that pass a truth test.
   _.filter = function(collection, iterator) {
-    var newArr = [];
+    var result = [];
     _.each(collection, function(element, index) {
       if (iterator(element)) {
-    	  newArr.push(element);
+    	  result.push(element);
       }
 	  });
-    return newArr;
+    return result;
   };
 
   // Return all elements of an array that don't pass a truth test.
   _.reject = function(collection, iterator) {
     // TIP: see if you can re-use _.select() here, without simply
     // copying code in and modifying it
-    var newArr = [];
+    var result = [];
     _.each(collection, function(element, index) {
       if (iterator(element) === false) {
-  		  newArr.push(element);
+  		  result.push(element);
       }
 	  });
-    return newArr;
+    return result;
   };
 
   // Produce a duplicate-free version of the array.
@@ -117,11 +115,11 @@ var _ = { };
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
-    var newArr = [];
+    var result = [];
     _.each(array, function(element, index, collection) {
-      newArr.push(iterator(element, index, collection));
+      result.push(iterator(element, index, collection));
 	  });
-    return newArr;
+    return result;
   };
 
   /*
@@ -169,10 +167,7 @@ var _ = { };
   //   }, 0); // should be 6
   //
   _.reduce = function(collection, iterator, initialValue) {
-    if (typeof(initialValue) === 'undefined') {
-  	  initialValue = 0;
-    }
-    var prevVal = initialValue;
+    var prevVal = (initialValue === undefined ? 0 : initialValue);
     _.each(collection, function(element, index) {
       prevVal = iterator(prevVal, element);
 	  });
@@ -227,7 +222,9 @@ var _ = { };
   // Logical some
   //   _.some = function(collection, iterator) {
   //   // TIP: There's a very clever way to re-use every() here.
-  //   iterator = iterator || function(i) { return i; };
+  //   iterator = iterator || function(i) { 
+  //     return i; 
+  //   };
   //   return !_.every(collection, function(item) {
   //     return !iterator(item);
   //   });
