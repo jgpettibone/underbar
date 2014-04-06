@@ -241,39 +241,39 @@ var _ = { };
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
-    var newObj = arguments[0];
+    var result = arguments[0];
     var initial = true;
     _.each(arguments, function(element, index) {
       if (!(initial)) {
     	  _.each(element, function(value, key) {
-  	      newObj[key] = value;
+  	      result[key] = value;
 	      });
       } else {
     	  initial = false;
       }
     });
-    return newObj;
+    return result;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
 
   _.defaults = function(obj) {
-    var newObj = arguments[0];
+    var result = arguments[0];
     var initial = true;
 
     _.each(arguments, function(element, index) {
       if (!(initial)) {
     	  _.each(element, function(value, key) {
-    		  if (!(key in newObj)) {
-    		      newObj[key] = value;
+    		  if (!(key in result)) {
+    		      result[key] = value;
     		  }
         });
       } else {
     	  initial = false;
       }
     });
-    return newObj;
+    return result;
   };
 
 
@@ -351,15 +351,14 @@ var _ = { };
     //shuffle array - Fisher-Yates shuffle via wikipedia
     //pseudocode worked backwards through array but probably could
     //change it to use _.each - later
-    var newArr = array.slice();
-    var len = array.length;
-    for (var i=len-1; i>0; i--) {
+    var result = array.slice();
+     for (var i=array.length-1; i>0; i--) {
   	  var rand = Math.round(Math.random() * (i-0) + 0);
-  	  var temp = newArr[rand];
-  	  newArr[rand] = newArr[i];
-  	  newArr[i] = temp;
+  	  var temp = result[rand];
+  	  result[rand] = result[i];
+  	  result[i] = temp;
     }
-    return newArr;
+    return result;
   };
 
   // Sort shuffle
@@ -420,7 +419,6 @@ var _ = { };
   _.intersection = function() {
     var first = arguments[0];
     var others = Array.prototype.slice.call(arguments, 1);
-    
     return _.filter(_.uniq(first), function(item) {
       return _.every(others, function(array) {
         return _.indexOf(array, item) > -1;
@@ -433,7 +431,6 @@ var _ = { };
   _.difference = function(array) {
     var first = arguments[0];
     var others = Array.prototype.slice.call(arguments, 1);
-    
     return _.filter(_.uniq(first), function(item) {
       return _.every(others, function(array) {
         return _.indexOf(array, item) === -1;
