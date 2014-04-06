@@ -207,11 +207,7 @@ var _ = { };
       if (testBool) {
   		  return true;
       }
-      if (typeof(iterator) === 'undefined') {
-  		  return !!element;
-      } else {
-		  return !!(iterator(element));
-      }
+      return (iterator === undefined ? !!element : !!iterator(element));
 	  }, false);
   };
 
