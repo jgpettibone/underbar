@@ -16,20 +16,29 @@ var _ = { };
   // Return an array of the first n elements of an array. If n is undefined,
   // return just the first element.
   _.first = function(array, n) {
-      return n === undefined ? array[0] : array.slice(0, n);
+    return n === undefined ? array[0] : array.slice(0, n);
   };
 
   // Like first, but for the last elements. If n is undefined, return just the
   // last element.
   _.last = function(array, n) {
     var arrLen = array.length;
-      if (n > arrLen) {
-	  var ind = 0;
-      } else {
-	  var ind = arrLen-n;
-      }
-      return n === undefined ? array[arrLen-1] : array.slice(ind, arrLen);
+    if (n > arrLen) {
+	   var ind = 0;
+    } else {
+  	  var ind = arrLen-n;
+    }
+    return n === undefined ? array[arrLen-1] : array.slice(ind, arrLen);
   };
+
+  // _.last = function(array, n) {
+  //   // the index to start the slice will either be 
+  //   // the arrLen - n (the last n elements) or it 
+  //   // will be 0 if arrLen - n is a negative number
+  //   // so I want the max of arrLen-n and 0
+  //     var arrLen = array.length;
+  //     return n === undefined ? array[arrLen-1] : array.slice(Math.max(arrLen-n, 0), arrLen);      
+  // };
 
   // Call iterator(value, key, collection) for each element of collection.
   // Accepts both arrays and objects.
@@ -37,12 +46,12 @@ var _ = { };
     if (Array.isArray(collection)) {
   	  //an Array
   	  for (var i = 0; i < collection.length; i++) {
-  	      iterator(collection[i], i, collection);
+  	    iterator(collection[i], i, collection);
   	  }
     } else {
   	  //an Object
   	  for (var key in collection) {
-  	      iterator(collection[key], key, collection);
+	      iterator(collection[key], key, collection);
   	  }
     }
   };
@@ -79,7 +88,7 @@ var _ = { };
     // copying code in and modifying it
     var newArr = [];
     _.each(collection, function(element, index) {
-      if (iterator(element) == false) {
+      if (iterator(element) === false) {
   		  newArr.push(element);
       }
 	  });
@@ -88,17 +97,18 @@ var _ = { };
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array) {
-    var myObj={};
-    myObj[array[0]]=1;
-    var newArr = [];
-    newArr[0] = array[0];
-    _.each(array, function(element, index) {
-      if(!(element in myObj)) {
-    	  newArr.push(element);
-    	  myObj[element]=1;
+    if (!array) {
+      return null;
+    }
+    var seen={};
+    var result = [];
+    _.each(array, function(element) {
+      if(!(element in seen)) {
+    	  result.push(element);
+    	  seen[element]=1;
       }
 	  });
-    return newArr;
+    return result;
   };
 
 
